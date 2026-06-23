@@ -83,11 +83,15 @@ function countFlags() {
   return board.flat().filter((cell) => cell.isFlagged).length;
 }
 
+function countOpenedMines() {
+  return board.flat().filter((cell) => cell.isMine && cell.isOpen).length;
+}
+
 function updateMineDisplays() {
   const total = countTotalMines();
-  const remaining = total - countFlags();
+  const remaining = total - countFlags() - countOpenedMines();
   mineTotalEl.textContent = String(total);
-  mineRemainingEl.textContent = String(remaining);
+  mineRemainingEl.textContent = String(Math.max(remaining, 0));
 }
 
 function updateLifeDisplay() {
@@ -149,6 +153,7 @@ function handleMineClick(cell) {
   cell.isMistakeMine = true;
   mistakes += 1;
   updateLifeDisplay();
+  updateMineDisplays();
   renderCell(cell);
 
   if (mistakes < MAX_MISTAKES) {
@@ -160,6 +165,7 @@ function handleMineClick(cell) {
   cell.element.classList.add("exploded");
   messageEl.textContent = "ゲームオーバー！";
   revealAllMines();
+  updateMineDisplays();
 }
 
 function toggleFlag(row, col) {
@@ -230,6 +236,7 @@ function checkWin() {
     gameOver = true;
     messageEl.textContent = "クリア！";
     revealAllMines();
+    updateMineDisplays();
   }
 }
 
